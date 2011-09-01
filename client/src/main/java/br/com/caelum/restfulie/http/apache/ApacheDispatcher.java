@@ -19,9 +19,12 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpTrace;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -34,12 +37,19 @@ import br.com.caelum.restfulie.request.RequestDispatcher;
 
 public class ApacheDispatcher implements RequestDispatcher {
 
-	private final HttpClient http = new DefaultHttpClient();
+	private final HttpClient http;
 	private final RestClient client;
 	private final HttpContext context;
 	private ApacheResponse lastExecuted;
 
 	public ApacheDispatcher(RestClient client) {
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		ClientConnectionManager manager = httpClient.getConnectionManager();
+		HttpParams params = httpClient.getParams();
+		ThreadSafeClientConnManager threadSafeClientConnManager = new ThreadSafeClientConnManager(params, manager.getSchemeRegistry());
+		
+		http = new DefaultHttpClient(threadSafeClientConnManager, params);
+		
 		this.client = client;
 		this.context = new BasicHttpContext();
 		context.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
