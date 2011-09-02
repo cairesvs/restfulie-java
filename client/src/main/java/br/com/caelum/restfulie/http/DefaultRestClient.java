@@ -37,7 +37,7 @@ import br.com.caelum.restfulie.request.RequestDispatcher;
 
 /**
  * Configured service entry point.
- *
+ * 
  * @author guilherme silveira
  */
 public class DefaultRestClient implements RestClient {
@@ -47,22 +47,21 @@ public class DefaultRestClient implements RestClient {
 	private RequestDispatcher dispatcher;
 
 	private Pluralizer inflector;
-	
+
 	private URI lastURI = null;
 
 	public DefaultRestClient() {
 		this(new CachedEnhancer(new DefaultEnhancer()));
 	}
-	
-	public DefaultRestClient(Enhancer enhancer) 
-	{
+
+	public DefaultRestClient(Enhancer enhancer) {
 		this.dispatcher = new ApacheDispatcher(this);
 		this.inflector = new NounPluralizer();
 		types.register(new XmlMediaType(enhancer));
 		types.register(new JsonMediaType(enhancer));
 		types.register(new FormEncoded());
 	}
-	
+
 	public DefaultRestClient use(RequestDispatcher executor) {
 		this.dispatcher = executor;
 		return this;
@@ -96,26 +95,27 @@ public class DefaultRestClient implements RestClient {
 
 	/**
 	 * Entry point to direct access an uri.
+	 * 
 	 * @throws URISyntaxException
 	 */
 	public Request at(String uri) {
 		try {
 			return at(new URI(uri));
 		} catch (URISyntaxException e) {
-			throw new RestfulieException("Unable to build an URI for this request.", e);
+			throw new RestfulieException(
+					"Unable to build an URI for this request.", e);
 		}
 	}
 
 	public URI lastURI() {
 		return lastURI;
 	}
-	
+
 	public Pluralizer inflectionRules() {
 		return inflector;
 	}
 
-	public RestClient withInflector(Pluralizer inflector) 
-	{
+	public RestClient withInflector(Pluralizer inflector) {
 		this.inflector = inflector;
 		return this;
 	}
