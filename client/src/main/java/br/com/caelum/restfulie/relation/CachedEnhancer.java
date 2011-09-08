@@ -2,6 +2,8 @@ package br.com.caelum.restfulie.relation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Caires & Thiago Miranda
@@ -14,6 +16,7 @@ public class CachedEnhancer implements Enhancer {
 
 	private final Enhancer enhancer;
 	private Map<Class, Class> cache = new HashMap<Class, Class>();
+	private final Lock lock = new ReentrantLock();
 
 	public CachedEnhancer(Enhancer enhancer) {
 		this.enhancer = enhancer;
@@ -23,9 +26,17 @@ public class CachedEnhancer implements Enhancer {
 		if(cache.containsKey(originalType)) {
 			return cache.get(originalType);
 		}
-		Class enhanced = enhancer.enhanceResource(originalType);
-		cache.put(originalType, enhanced);
-		return enhanced;
+		lock.lock();
+		try {
+			if(cache.containsKey(originalType)) {
+				return cache.get(originalType);
+			}
+			Class enhanced = enhancer.enhanceResource(originalType);
+			cache.put(originalType, enhanced);
+			return enhanced;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 }

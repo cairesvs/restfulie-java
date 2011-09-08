@@ -19,7 +19,7 @@ public class DefaultEnhancer implements Enhancer {
 		}
 		try {
 			// TODO extract this enhancement to an interface and test it appart
-			CtClass newType =   pool.makeClass("br.com.caelum.restfulie." + originalType.getSimpleName() + "_" + System.currentTimeMillis());
+			CtClass newType =   pool.makeClass("br.com.caelum.restfulie." + originalType.getSimpleName() + "$" + System.currentTimeMillis());
 			newType.setSuperclass(pool.get(originalType.getName()));
 			newType.addInterface(pool.get(Resource.class.getName()));
 			enhanceLinks(newType);
